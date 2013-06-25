@@ -3,7 +3,7 @@ require 'rubygems'
 require 'json'
 require 'pp'
 
-json = File.read("movies.txt")
+json = File.read("movies.json")
 movies = JSON.parse(json)
 
 pool = []
