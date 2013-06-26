@@ -1,19 +1,78 @@
 #!/usr/bin/env ruby
+
 require 'rubygems'
 require 'json'
 require 'pp'
+require 'themoviedb'
 
-json = File.read("movies.json")
-movies = JSON.parse(json)
+Tmdb::Api.key("11433deecaf09ef3aa3fb68d7e02a772")
 
-pool = []
-pp movies
-movies.each do |id,movie|
-  weight = movie["rating"] * 10
-  weight.to_i.times do pool << id end
+class ::Hash
+  def method_missing(name)
+    return self[name] if key? name
+    self.each { |k,v| return v if k.to_s.to_sym == name }
+    super.method_missing name
+  end
 end
 
-puts pool.count
+def open
+  if File.exists? 'movies.json':
+    json = File.read('movies.json')
+    @movies = JSON.parse(json)
+  else
+    @movies = Hash.new
+  end
+end
 
-gold = pool.choice
-exec("open http://www.imdb.com/title/" << gold)
+def close
+  File.open('movies.json', 'w') { |f| f.write(@movies.to_json) }
+end
+
+def flip
+  open
+  pool = []
+
+  @movies.each do |id,movie|
+    weight = movie.rating * 10
+    weight.to_i.times do pool << id end
+  end
+
+  puts @movies[pool.choice].title
+end
+
+def add(title)
+  open
+  movie = Tmdb::Movie.find(title)[0]
+  @movies[movie.id.to_s] = {'title' => movie.title,
+                       'rating' => movie.vote_average,
+                       'id' => movie.id}
+  close
+end
+
+def list
+  open
+  puts "ID - Title\n\n"
+  @movies.each do |id, movie|
+    puts "#{ id } - #{ movie.title }"
+  end
+end
+
+def remove(id)
+  open
+  @movies.delete(id)
+  close
+end
+
+if __FILE__ == $0
+  action = ARGV[0]
+  case action
+  when 'flip', 'f'
+    flip
+  when 'add', 'a'
+    add ARGV[1]
+  when 'list', 'l'
+    list
+  when 'del', 'delete', 'remove', 'd'
+    remove ARGV[1]
+  end
+end
