@@ -3,10 +3,10 @@
 require "rubygems"
 require "json"
 require "pp"
-require "themoviedb"
+require "ruby-tmdb3"
 require "colorize"
 
-Tmdb::Api.key("11433deecaf09ef3aa3fb68d7e02a772")
+Tmdb.api_key = "11433deecaf09ef3aa3fb68d7e02a772"
 
 DBFILE = ".coindb.json"
 DB_LOCATION = "~/"
@@ -73,10 +73,14 @@ class MoviePool
 
   def add(movie, uri=nil)
     imdb = movie.match /imdb.com\/title\/(tt\d+)/
-    puts "Found IMDB URL!"
     tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
-    puts "Found TMDB URL!"
-    result = Tmdb::Movie.find(movie)[0]
+    if tmdb
+      result = TmdbMovie.find(:id => tmdb.captures[0], :limit => 1)
+    elsif imdb
+      result = TmdbMovie.find(:imdb => imdb.captures[0], :limit => 1)
+    else
+      result = TmdbMovie.find(:title => movie, :limit => 1)
+    end
     @movies[result.id.to_s] = {"title" => result.title,
                               "rating" => result.vote_average,
                               "tmdb" => result.id,
