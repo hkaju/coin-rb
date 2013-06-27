@@ -16,8 +16,8 @@ class ::Hash
 end
 
 def open
-  if File.exists? 'movies.json':
-    json = File.read('movies.json')
+  if File.exists? File.expand_path('~/.coindb.json'):
+    json = File.read(File.expand_path('~/.coindb.json'))
     @movies = JSON.parse(json)
   else
     @movies = Hash.new
@@ -25,7 +25,7 @@ def open
 end
 
 def close
-  File.open('movies.json', 'w') { |f| f.write(@movies.to_json) }
+  File.open(File.expand_path('~/.coindb.json'), 'w') { |f| f.write(@movies.to_json) }
 end
 
 def flip
