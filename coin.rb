@@ -4,6 +4,7 @@ require "rubygems"
 require "json"
 require "pp"
 require "themoviedb"
+require "colorize"
 
 Tmdb::Api.key("11433deecaf09ef3aa3fb68d7e02a772")
 
@@ -18,40 +19,59 @@ class ::Hash
   end
 end
 
-
 class MoviePool
   
   def initialize
     self.read_database
   end
   
-  def read_database()
+  def read_database
     db_path = DB_LOCATION + DBFILE
     if File.exists? File.expand_path(db_path):
       json = File.read(File.expand_path(db_path))
       @movies = JSON.parse(json)
+    else
+      @movies = Hash.new
     end
   end
 
   def write_database
-    File.open(File.expand_path(DB_LOCATION + DBFILE), "w") { |f| f.write(@movies.to_json) }
+    db_path = DB_LOCATION + DBFILE
+    File.open(File.expand_path(db_path), "w") { |f| f.write(@movies.to_json) }
   end
 
   def flip
-    self.read_database
     pool = []
 
     @movies.each do |tmdb, movie|
-      weight = movie.rating * 10
-      weight.to_i.times do pool << tmdb end
+      unless movie.key? "watched"
+        weight = movie.rating * 10
+        weight.to_i.times do pool << tmdb end
+      end
     end
 
     random_movie = @movies[pool.choice]
     return random_movie
   end
+  
+  def watch(tmdb=nil)
+    if tmdb
+      movie = @movies[tmdb]
+    else
+      movie = self.flip
+    end
+    puts "Now watching #{ movie.title }"
+    self.mark_as_watched(movie.tmdb.to_s)
+    exec("open '#{ movie.uri }'") if movie.key? "uri"
+  end
+  
+  def mark_as_watched(tmdb)
+    time = Time.now
+    @movies[tmdb]["watched"] = time.strftime("%Y-%m-%d %H:%M")
+    self.write_database
+  end
 
   def add(title, uri=nil)
-    self.read_database
     movie = Tmdb::Movie.find(title)[0]
     @movies[movie.id.to_s] = {"title" => movie.title,
                               "rating" => movie.vote_average,
@@ -63,15 +83,23 @@ class MoviePool
   end
 
   def list
-    self.read_database
-    puts "TMDB ID - Title\n\n"
+    puts "TMDB ID - Title (Year)\n"
+    watched = []
     @movies.each do |key, movie|
-      puts "#{ key } - #{ movie.title } (#{ movie.released[0..3] })"
+      if movie.key? "watched"
+        watched << movie
+      else
+        puts "#{ key } - #{ movie.title } (#{ movie.released[0..3] })"
+      end
     end
+    puts "\nWatched:"
+    watched.each do |movie|
+      puts "#{ movie.tmdb.to_s } - #{ movie.title } (#{ movie.released[0..3] })"
+    end
+    #pp @movies
   end
 
   def remove(tmdb)
-    self.read_database
     @movies.delete(tmdb)
     self.write_database
   end
