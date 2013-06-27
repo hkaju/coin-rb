@@ -71,15 +71,19 @@ class MoviePool
     self.write_database
   end
 
-  def add(title, uri=nil)
-    movie = Tmdb::Movie.find(title)[0]
-    @movies[movie.id.to_s] = {"title" => movie.title,
-                              "rating" => movie.vote_average,
-                              "tmdb" => movie.id,
-                              "released" => movie.release_date}
-    @movies[movie.id.to_s]["uri"] = uri if uri
+  def add(movie, uri=nil)
+    imdb = movie.match /imdb.com\/title\/(tt\d+)/
+    puts "Found IMDB URL!"
+    tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
+    puts "Found TMDB URL!"
+    result = Tmdb::Movie.find(movie)[0]
+    @movies[result.id.to_s] = {"title" => result.title,
+                              "rating" => result.vote_average,
+                              "tmdb" => result.id,
+                              "released" => result.release_date}
+    @movies[result.id.to_s]["uri"] = uri if uri
     self.write_database
-    puts "Added #{ movie.title } (#{ movie.release_date[0..3] })"
+    puts "Added #{ result.title } (#{ result.release_date[0..3] })"
   end
 
   def list
@@ -100,8 +104,19 @@ class MoviePool
   end
 
   def remove(tmdb)
-    @movies.delete(tmdb)
-    self.write_database
+    movie = @movies[tmdb]
+    if movie
+      @movies.delete(tmdb)
+      self.write_database
+      puts "Deleted #{ movie.title } (#{ movie.released[0..3] })"
+    else
+      puts "Movie not found!"
+    end
+  end
+  
+  def help
+    # TODO Help text
+    puts "Coming soon..."
   end
 
 end
