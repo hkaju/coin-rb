@@ -122,6 +122,16 @@ class MoviePool
     # TODO Help text
     puts "Coming soon..."
   end
+  
+  def import(filename)
+    if File.exist? filename
+      File.open(filename, "r").each_line do |entry|
+        self.add entry unless entry.match /^[\s]*$/
+      end
+    else
+      puts "File not found: #{ filename }"
+    end
+  end
 
 end
 
@@ -149,5 +159,7 @@ if __FILE__ == $0
     pool.list
   when "rm", "del", "delete", "remove", "d"
     pool.remove ARGV[1]
+  when "import", "i"
+    pool.import ARGV[1]
   end
 end
