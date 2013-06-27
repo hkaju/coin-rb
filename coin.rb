@@ -37,15 +37,18 @@ def flip
     weight.to_i.times do pool << id end
   end
 
-  puts @movies[pool.choice].title
+  gold = pool.choice
+  response = gold ? @movies[gold].title : "No movies in database!"
+  puts response
 end
 
-def add(title)
+def add(title, uri=nil)
   open
   movie = Tmdb::Movie.find(title)[0]
   @movies[movie.id.to_s] = {'title' => movie.title,
                        'rating' => movie.vote_average,
                        'id' => movie.id}
+  @movies[movie.id.to_s]['uri'] = uri if uri
   close
 end
 
@@ -69,7 +72,12 @@ if __FILE__ == $0
   when 'flip', 'f'
     flip
   when 'add', 'a'
-    add ARGV[1]
+    if ARGV[2]
+      # TODO URI validation
+      add(ARGV[1], ARGV[2])
+    else
+      add ARGV[1]
+    end
   when 'list', 'l'
     list
   when 'del', 'delete', 'remove', 'd'
