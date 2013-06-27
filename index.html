@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Coin-rb by hkaju</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Coin-rb</h1>
+        <h2></h2>
+
+        <section id="downloads">
+          <a href="https://github.com/hkaju/coin-rb/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/hkaju/coin-rb/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/hkaju/coin-rb" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h2>
+<a name="what-is-coin-rb" class="anchor" href="#what-is-coin-rb"><span class="octicon octicon-link"></span></a>What is coin-rb?</h2>
+
+<p>Coin is a command-line utility that chooses a (semi-)random movie from a previously compiled list.</p>
+
+<p>The probability of a movie being drawn from the pool is proportional to the movie's rating.
+A movie with a rating of 10.0 is twice as likely to be chosen as one with a rating of 5.0.</p>
+
+<p>Coin uses themoviedb.org as it's backend when adding movies.</p>
+
+<h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<p>Coin uses <code>json</code> and <code>themoviedb</code> gems.
+You can install them with</p>
+
+<pre><code>gem install json themoviedb
+</code></pre>
+
+<p>There is no special installation procedure for coin. If you want to make your life easier, copy <code>coin.rb</code> to a folder that is in your <code>$PATH</code> and rename it to <code>coin</code>.</p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<pre><code>coin add "&lt;movie title" - add a movie to your pool
+coin flip - select a movie from your pool and play it if the file is available
+coin list - list all currently added and unwatched movies
+</code></pre>
+      </section>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-2630842-8");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
