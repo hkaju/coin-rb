@@ -7,6 +7,9 @@ require 'themoviedb'
 
 Tmdb::Api.key("11433deecaf09ef3aa3fb68d7e02a772")
 
+DBFILE = '.coindb.json'
+DB_LOCATION = '~/'
+
 class ::Hash
   def method_missing(name)
     return self[name] if key? name
@@ -15,62 +18,71 @@ class ::Hash
   end
 end
 
-def open
-  if File.exists? File.expand_path('~/.coindb.json'):
-    json = File.read(File.expand_path('~/.coindb.json'))
+def read_database()
+  db_path = DB_LOCATION + DBFILE
+  if File.exists? File.expand_path(db_path):
+    json = File.read(File.expand_path(db_path))
     @movies = JSON.parse(json)
   else
     @movies = Hash.new
   end
 end
 
-def close
-  File.open(File.expand_path('~/.coindb.json'), 'w') { |f| f.write(@movies.to_json) }
+def write_database
+  File.open(File.expand_path(DB_LOCATION + DBFILE), 'w') { |f| f.write(@movies.to_json) }
 end
 
 def flip
-  open
+  read_database
   pool = []
 
-  @movies.each do |id,movie|
+  @movies.each do |tmdb, movie|
     weight = movie.rating * 10
-    weight.to_i.times do pool << id end
+    weight.to_i.times do pool << tmdb end
   end
 
-  gold = pool.choice
-  response = gold ? @movies[gold].title : "No movies in database!"
-  puts response
+  random_movie = @movies[pool.choice]
+  return random_movie
 end
 
 def add(title, uri=nil)
-  open
+  read_database
   movie = Tmdb::Movie.find(title)[0]
   @movies[movie.id.to_s] = {'title' => movie.title,
                        'rating' => movie.vote_average,
-                       'id' => movie.id}
+                       'tmdb' => movie.id,
+                       'released' => movie.release_date}
   @movies[movie.id.to_s]['uri'] = uri if uri
-  close
+  write_database
+  puts "Added #{ movie.title } (#{ movie.release_date[0..3] })"
 end
 
 def list
-  open
-  puts "ID - Title\n\n"
-  @movies.each do |id, movie|
-    puts "#{ id } - #{ movie.title }"
+  read_database
+  puts "TMDB ID - Title\n\n"
+  @movies.each do |key, movie|
+    puts "#{ key } - #{ movie.title } (#{ movie.released[0..3] })"
   end
 end
 
-def remove(id)
-  open
-  @movies.delete(id)
-  close
+def remove(tmdb)
+  read_database
+  @movies.delete(tmdb)
+  write_database
 end
 
 if __FILE__ == $0
   action = ARGV[0]
   case action
   when 'flip', 'f'
-    flip
+    movie = flip
+    puts movie.title if movie
+  when 'watch', 'w'
+    if ARGV[1]
+      watch ARGV[1]
+    else
+      watch
+    end
   when 'add', 'a'
     if ARGV[2]
       # TODO URI validation
@@ -80,7 +92,7 @@ if __FILE__ == $0
     end
   when 'list', 'l'
     list
-  when 'del', 'delete', 'remove', 'd'
+  when 'rm', 'del', 'delete', 'remove', 'd'
     remove ARGV[1]
   end
 end
