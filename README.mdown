@@ -1,0 +1,25 @@
+# README
+
+## What is coin-rb?
+
+Coin is a command-line utility that chooses a (semi-)random movie from a previously compiled list.
+
+The probability of a movie being drawn from the pool is proportional to the movie's rating.
+A movie with a rating of 10.0 is twice as likely to be chosen as one with a rating of 5.0.
+
+Coin uses themoviedb.org as it's backend when adding movies.
+
+## Requirements
+
+Coin uses `json` and `themoviedb` gems.
+You can install them with
+
+    gem install json themoviedb
+
+There is no special installation procedure for coin. If you want to make your life easier, copy `coin.rb` to a folder that is in your `$PATH` and rename it to `coin`.
+
+## Usage
+
+    coin add "<movie title" - add a movie to your pool
+    coin flip - select a movie from your pool and play it if the file is available
+    coin list - list all currently added and unwatched movies
