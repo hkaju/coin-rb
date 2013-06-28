@@ -58,7 +58,7 @@ class MoviePool
   def flip
     movie = self.pick
       if movie
-        puts "Your random movie is #{ movie.title } (#{ movie.released[0..3] })"
+        puts "Your random movie is #{ movie.title.blue } (#{ movie.released[0..3] })"
         self.mark_as_watched(movie.tmdb.to_s)
         #exec("open '#{ movie.uri }'") if movie.key? "uri"
       else
@@ -89,7 +89,7 @@ class MoviePool
                                  "released" => result.release_date}
       @movies[result.id.to_s]["uri"] = uri if uri
       self.write_database
-      puts "Added #{ result.title } (#{ result.release_date[0..3] })"
+      puts "Added #{ result.title.blue } (#{ result.release_date[0..3] })"
     else
       puts "Movie not found: #{ movie }"
     end
@@ -102,14 +102,14 @@ class MoviePool
       if movie.key? "watched"
         watched << movie
       else
-        puts "#{ key } - #{ movie.title } (#{ movie.released[0..3] })"
+        puts "#{ movie.tmdb.to_s.green } - #{ movie.title.blue } (#{ movie.released[0..3] })"
       end
     end
     puts "\nWatched:"
     watched.each do |movie|
-      puts "#{ movie.tmdb.to_s } - #{ movie.title } (#{ movie.released[0..3] })"
+      puts "#{ movie.tmdb.to_s.green } - #{ movie.title.red } (#{ movie.released[0..3] })"
     end
-    #pp @movies
+    pp @movies
   end
 
   def remove(tmdb)
@@ -125,12 +125,12 @@ class MoviePool
   
   def import(filename)
     if File.exist? filename
-      puts "Importing #{ filename }..."
+      puts "Importing #{ filename.dup.green }..."
       File.open(filename, "r").each_line do |entry|
         self.add entry unless entry.match /^[\s]*$/
       end
     else
-      puts "File not found: #{ filename }"
+      puts "File not found: #{ filename.dup.green }"
     end
   end
 
