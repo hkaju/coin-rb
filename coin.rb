@@ -5,6 +5,7 @@ require "json"
 require "pp"
 require "ruby-tmdb3"
 require "colorize"
+require "trollop"
 
 Tmdb.api_key = "11433deecaf09ef3aa3fb68d7e02a772"
 
@@ -40,7 +41,7 @@ class MoviePool
     File.open(File.expand_path(db_path), "w") { |f| f.write(@movies.to_json) }
   end
 
-  def flip
+  def pick
     pool = []
 
     @movies.each do |tmdb, movie|
@@ -54,11 +55,11 @@ class MoviePool
     return random_movie
   end
   
-  def watch(tmdb=nil)
+  def flip(tmdb=nil)
     if tmdb
       movie = @movies[tmdb]
     else
-      movie = self.flip
+      movie = self.pick
     end
     puts "Now watching #{ movie.title }"
     self.mark_as_watched(movie.tmdb.to_s)
@@ -136,30 +137,31 @@ class MoviePool
 end
 
 if __FILE__ == $0
-  action = ARGV[0]
   pool = MoviePool.new
-  case action
-  when "flip", "f"
-    movie = pool.flip
-    puts movie.title if movie
-  when "watch", "w"
-    if ARGV[1]
-      pool.watch ARGV[1]
-    else
-      pool.watch
-    end
-  when "add", "a"
-    if ARGV[2]
-      # TODO URI validation
-      pool.add(ARGV[1], ARGV[2])
-    else
-      pool.add ARGV[1]
-    end
-  when "list", "l"
-    pool.list
-  when "rm", "del", "delete", "remove", "d"
-    pool.remove ARGV[1]
-  when "import", "i"
-    pool.import ARGV[1]
+  
+  SUB_COMMANDS = %w(add a list l flip f remove delete d rm del)
+  global_opts = Trollop::options do
+    version "coin-rb 0.1 (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>"
+    banner "Coin is a utility for picking a semi-random selection from a pool of acceptable movies"
+    opt :database, "Movie database file location", :default => File.expand_path(DB_LOCATION + DBFILE)
+    stop_on SUB_COMMANDS
   end
+
+  cmd = ARGV.shift
+  cmd_opts = case cmd
+    when "delete", "remove", "rm", "del", "d"
+      ARGV.each do |arg| pool.remove arg end
+    when "add", "a"
+      ARGV.each do |arg| pool.add arg  end
+    when "list", "l"
+      pool.list
+    when "flip", "f"
+      if ARGV[0]
+        pool.flip ARGV[0]
+      else
+        pool.flip
+      end
+    else
+      Trollop::die "Unknown command #{cmd.inspect}"
+    end
 end
