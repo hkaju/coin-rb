@@ -55,15 +55,11 @@ class MoviePool
     return random_movie
   end
   
-  def flip(tmdb=nil)
-    if tmdb
-      movie = @movies[tmdb]
-    else
-      movie = self.pick
-    end
-    puts "Now watching #{ movie.title }"
+  def flip
+    movie = self.pick
+    puts "Your random movie is #{ movie.title }"
     self.mark_as_watched(movie.tmdb.to_s)
-    exec("open '#{ movie.uri }'") if movie.key? "uri"
+    #exec("open '#{ movie.uri }'") if movie.key? "uri"
   end
   
   def mark_as_watched(tmdb)
@@ -142,8 +138,21 @@ if __FILE__ == $0
   SUB_COMMANDS = %w(add a list l flip f remove delete d rm del)
   global_opts = Trollop::options do
     version "coin-rb 0.1 (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>"
-    banner "Coin is a utility for picking a semi-random selection from a pool of acceptable movies"
-    opt :database, "Movie database file location", :default => File.expand_path(DB_LOCATION + DBFILE)
+    banner <<-EOS
+Coin is a utility for picking a semi-random selection from a pool of acceptable movies.
+
+Usage:
+    coin [action] <argument(s)>
+    
+Actions:
+    add, a         Add a new movie to the database. Arguments can be movie titles, IMDB addresses (www.imdb.com/title/<IDMB ID>) or TMDb addresses (www.themoviedb.org/movie/<TMDb ID>). If the title contains spaces, enclose it in double quotes (e.g. 'coin add "Kung Fu Panda"')
+    delete, d      Delete a movie from the database. Arguments are movie IDs (TMDb IDs) that are displayed by 'coin list'
+    flip, f        Get a semi-random movie from the database
+    list, l        List all movies in the database
+    
+Options:
+EOS
+    #opt :database, "Movie database file location", :default => File.expand_path(DB_LOCATION + DBFILE)
     stop_on SUB_COMMANDS
   end
 
@@ -156,11 +165,7 @@ if __FILE__ == $0
     when "list", "l"
       pool.list
     when "flip", "f"
-      if ARGV[0]
-        pool.flip ARGV[0]
-      else
-        pool.flip
-      end
+      pool.flip
     else
       Trollop::die "Unknown command #{cmd.inspect}"
     end
