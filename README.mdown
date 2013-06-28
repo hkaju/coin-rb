@@ -1,25 +1,59 @@
-# README
+## What is coin?
 
-## What is coin-rb?
+> G: Let's watch a movie!  
+> B: Sure! What movie would you like to see?  
+> G: Dunno! Let's find something from IMDB.  
+> B: OK!  
+> *B and G open IMDB.com*  
+> G: This one looks fun! But I don't feel like watching sci-fi tonight. Let's put it on our Watch Later list.  
+> B: I found a good one! But it's a bit too long. I'll add it to the Watch Later list.  
+> *2 hours later with 20 movies in the Watch Later list*  
+> B: I give up!  
+> G: Picking the perfect movie is really hard!  
+> B *and* G *at the same time*: If only there was a simple, easy to use command line program that would pick out a semi-random movie from our Watch Later list!  
 
-Coin is a command-line utility that chooses a (semi-)random movie from a previously compiled list.
+If that exchange sounded familiar, you are in the right place!
+Coin is a command-line utility that chooses a semi-random movie from a previously compiled list.
+Movies can be added by title, IMDB address or themoviedb.org URL.
+Coin uses themoviedb.org as it's backend for downloading metadata.
 
+### How does it work?
+Coin puts all unwatched movies from your list into a general pool and draws a semi-random choice from there.
+Not all movies have the same likelihood of being selected.
 The probability of a movie being drawn from the pool is proportional to the movie's rating.
-A movie with a rating of 10.0 is twice as likely to be chosen as one with a rating of 5.0.
+A movie with a rating of 10.0 is about twice as likely to be chosen as one with a rating of 5.0.
 
-Coin uses themoviedb.org as it's backend when adding movies.
+### Why semi-random and not plain old random?
+It seemed like a semi-sensible design choice.
 
-## Requirements
+## Requirements and installation
 
-Coin uses `json` and `themoviedb` gems.
+Coin uses `json`, `themoviedb`, `colorize` and `trollop` gems.
 You can install them with
 
-    gem install json themoviedb
+    gem install json themoviedb colorize trollop
 
-There is no special installation procedure for coin. If you want to make your life easier, copy `coin.rb` to a folder that is in your `$PATH` and rename it to `coin`.
+There is no special installation procedure for coin.
+If you want to make your life easier, copy `coin.rb` to a folder that is in your `$PATH` and rename it to `coin`.
+Coin will create a database file called `.coindb.json` in your home directory.
 
 ## Usage
+    	coin [action] <argument(s)>
+    
+	Actions:
+    	add, a         Add a new movie to the database. 
+					   Arguments can be movie titles, IMDB addresses 
+					   (www.imdb.com/title/<IDMB ID>) or TMDb addresses
+					   (www.themoviedb.org/movie/<TMDb ID>). If the title 
+					   contains spaces, enclose it in double quotes
+					   (e.g. coin add "Kung Fu Panda")
+    	delete, d      Delete a movie from the database. Arguments are
+					   movie IDs (TMDb IDs) that are displayed by the "list" command
+    	flip, f        Get a semi-random movie from the database
+    	list, l        List all movies in the database
+    	import, i      Import movies from a file that contains one movie
+					   title/IMDB URL/TMDb URL per line. Arguments are paths to text files
 
-    coin add "<movie title" - add a movie to your pool
-    coin flip - select a movie from your pool and play it if the file is available
-    coin list - list all currently added and unwatched movies
+## Bugs, problems, questions
+
+Feel free to use the GitHub Issue tracker for for filing bug reports. Also for questions, problems, feature requests, Christmas wishlists etc.
