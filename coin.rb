@@ -2,7 +2,6 @@
 
 require "rubygems"
 require "json"
-require "pp"
 require "ruby-tmdb3"
 require "colorize"
 require "trollop"
