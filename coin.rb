@@ -43,10 +43,10 @@ class MoviePool
   def pick
     pool = []
 
-    @movies.each do |tmdb, movie|
+    @movies.each do |tmdb_id, movie|
       unless movie.key? "watched"
         weight = movie.rating * 10 + 1
-        weight.to_i.times do pool << tmdb end
+        weight.to_i.times do pool << tmdb_id end
       end
     end
 
@@ -58,20 +58,20 @@ class MoviePool
     movie = self.pick
       if movie
         puts "Your random movie is #{ movie.title.blue } (#{ movie.released[0..3] })"
-        self.mark_as_watched(movie.tmdb.to_s)
-        #exec("open '#{ movie.uri }'") if movie.key? "uri"
+        self.mark_as_watched(movie.tmdb_id.to_s)
+        exec("open '#{ movie.url }'") if movie.key? "url"
       else
         puts "No more unwatched movies in the database. Try adding some with 'coin add'."
       end
   end
   
-  def mark_as_watched(tmdb)
+  def mark_as_watched(tmdb_id)
     time = Time.now
-    @movies[tmdb]["watched"] = time.strftime("%Y-%m-%d %H:%M")
+    @movies[tmdb_id]["watched"] = time.strftime("%Y-%m-%d %H:%M")
     self.write_database
   end
 
-  def add(movie, uri=nil)
+  def add(movie)
     imdb = movie.match /imdb.com\/title\/(tt\d+)/
     tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
     if tmdb
@@ -84,14 +84,23 @@ class MoviePool
     if result != []
       @movies[result.id.to_s] = {"title" => result.title,
                                  "rating" => result.vote_average,
-                                 "tmdb" => result.id,
+                                 "tmdb_id" => result.id,
                                  "released" => result.release_date}
-      @movies[result.id.to_s]["uri"] = uri if uri
       self.write_database
       puts "Added #{ result.title.blue } (#{ result.release_date[0..3] })"
     else
       puts "Movie not found: #{ movie }"
     end
+  end
+  
+  def addurl(tmdb_id, url)
+    if @movies.key? tmdb_id
+      @movies[tmdb_id]["url"] = url
+      puts "Added URL to #{ @movies[tmdb_id].title.blue } (#{ @movies[tmdb_id].released[0..3] })"
+    else
+      puts "Movie with ID #{ tmdb_id } not found!"
+    end
+    self.write_database
   end
 
   def list
@@ -102,19 +111,19 @@ class MoviePool
       if movie.key? "watched"
         watched << movie
       else
-        puts "#{ movie.tmdb.to_s.green } \t #{ movie.title.blue } (#{ movie.released[0..3] })"
+        puts "#{ movie.tmdb_id.to_s.green } \t #{ movie.title.blue } (#{ movie.released[0..3] })"
       end
     end
     puts "\nAlready watched:"
     watched.each do |movie|
-      puts "#{ movie.tmdb.to_s.green } \t #{ movie.title.red } (#{ movie.released[0..3] })"
+      puts "#{ movie.tmdb_id.to_s.green } \t #{ movie.title.red } (#{ movie.released[0..3] })"
     end
   end
 
-  def remove(tmdb)
-    movie = @movies[tmdb]
+  def remove(tmdb_id)
+    movie = @movies[tmdb_id]
     if movie
-      @movies.delete(tmdb)
+      @movies.delete(tmdb_id)
       self.write_database
       puts "Deleted #{ movie.title } (#{ movie.released[0..3] })"
     else
@@ -138,7 +147,7 @@ end
 if __FILE__ == $0
   pool = MoviePool.new
   
-  SUB_COMMANDS = %w(add a list l flip f remove delete d rm del import i)
+  SUB_COMMANDS = %w(add a list l flip f remove delete d rm del import i url u)
   global_opts = Trollop::options do
     version "coin-rb 0.1 (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>"
     banner <<-EOS
@@ -153,6 +162,7 @@ Actions:
     #{ "flip, f".green }        Get a semi-random movie from the database
     #{ "list, l".green }        List all movies in the database
     #{ "import, i".green }      Import movies from a file that contains one movie title/IMDB URL/TMDb URL per line. Arguments are paths to text files
+    #{ "url, u".green }         Add a URL to a movie in the database. When the movie is selected, the URL is opened with the command 'open <URL>'. Arguments are the ID of the movie and the URL/filename
     
 Options:
 EOS
@@ -165,7 +175,14 @@ EOS
     when "delete", "remove", "rm", "del", "d"
       ARGV.each do |arg| pool.remove arg end
     when "add", "a"
-      ARGV.each do |arg| pool.add arg  end
+      ARGV.each do |arg| pool.add arg end
+    when "url", "u"
+      tmdb_id = ARGV.shift
+      if ARGV[0]
+        pool.addurl(tmdb_id, ARGV[0])
+      else
+        puts "Missing URL!"
+      end
     when "list", "l"
       pool.list
     when "flip", "f"
