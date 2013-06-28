@@ -46,7 +46,7 @@ class MoviePool
 
     @movies.each do |tmdb, movie|
       unless movie.key? "watched"
-        weight = movie.rating * 10
+        weight = movie.rating * 10 + 1
         weight.to_i.times do pool << tmdb end
       end
     end
