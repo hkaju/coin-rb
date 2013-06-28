@@ -125,6 +125,7 @@ class MoviePool
   
   def import(filename)
     if File.exist? filename
+      puts "Importing #{ filename }..."
       File.open(filename, "r").each_line do |entry|
         self.add entry unless entry.match /^[\s]*$/
       end
@@ -138,7 +139,7 @@ end
 if __FILE__ == $0
   pool = MoviePool.new
   
-  SUB_COMMANDS = %w(add a list l flip f remove delete d rm del)
+  SUB_COMMANDS = %w(add a list l flip f remove delete d rm del import i)
   global_opts = Trollop::options do
     version "coin-rb 0.1 (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>"
     banner <<-EOS
@@ -152,6 +153,7 @@ Actions:
     delete, d      Delete a movie from the database. Arguments are movie IDs (TMDb IDs) that are displayed by 'coin list'
     flip, f        Get a semi-random movie from the database
     list, l        List all movies in the database
+    import, i      Import movies from a file that contains one movie title/IMDB URL/TMDb URL per line. Arguments are paths to text files
     
 Options:
 EOS
@@ -169,6 +171,8 @@ EOS
       pool.list
     when "flip", "f"
       pool.flip
+    when "import", "i"
+      ARGV.each do |arg| pool.import arg  end
     else
       Trollop::die "Unknown command #{cmd.inspect}"
     end
