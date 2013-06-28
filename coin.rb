@@ -5,6 +5,7 @@ require "json"
 require "ruby-tmdb3"
 require "colorize"
 require "trollop"
+require "pp"
 
 Tmdb.api_key = "11433deecaf09ef3aa3fb68d7e02a772"
 
@@ -71,7 +72,7 @@ class MoviePool
     self.write_database
   end
 
-  def add(movie)
+  def add(movie, url=nil)
     imdb = movie.match /imdb.com\/title\/(tt\d+)/
     tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
     if tmdb
@@ -86,6 +87,7 @@ class MoviePool
                                  "rating" => result.vote_average,
                                  "tmdb_id" => result.id,
                                  "released" => result.release_date}
+      @movies[result.id.to_s]["url"] = url if url
       self.write_database
       puts "Added #{ result.title.blue } (#{ result.release_date[0..3] })"
     else
@@ -135,7 +137,12 @@ class MoviePool
     if File.exist? filename
       puts "Importing #{ filename.dup.green }..."
       File.open(filename, "r").each_line do |entry|
-        self.add entry unless entry.match /^[\s]*$/
+        parts = entry.strip.split ";"
+        if parts.length == 2
+          self.add(parts[0], url=parts[1]) unless parts[0].match /^[\s]*$/
+        else
+          self.add entry unless entry.match /^[\s]*$/
+        end
       end
     else
       puts "File not found: #{ filename.dup.green }"
