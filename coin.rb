@@ -57,9 +57,13 @@ class MoviePool
   
   def flip
     movie = self.pick
-    puts "Your random movie is #{ movie.title }"
-    self.mark_as_watched(movie.tmdb.to_s)
-    #exec("open '#{ movie.uri }'") if movie.key? "uri"
+      if movie
+        puts "Your random movie is #{ movie.title } (#{ movie.released[0..3] })"
+        self.mark_as_watched(movie.tmdb.to_s)
+        #exec("open '#{ movie.uri }'") if movie.key? "uri"
+      else
+        puts "No more unwatched movies in the database. Try adding some with 'coin add'."
+      end
   end
   
   def mark_as_watched(tmdb)
@@ -78,13 +82,17 @@ class MoviePool
     else
       result = TmdbMovie.find(:title => movie, :limit => 1)
     end
-    @movies[result.id.to_s] = {"title" => result.title,
-                              "rating" => result.vote_average,
-                              "tmdb" => result.id,
-                              "released" => result.release_date}
-    @movies[result.id.to_s]["uri"] = uri if uri
-    self.write_database
-    puts "Added #{ result.title } (#{ result.release_date[0..3] })"
+    if result != []
+      @movies[result.id.to_s] = {"title" => result.title,
+                                 "rating" => result.vote_average,
+                                 "tmdb" => result.id,
+                                 "released" => result.release_date}
+      @movies[result.id.to_s]["uri"] = uri if uri
+      self.write_database
+      puts "Added #{ result.title } (#{ result.release_date[0..3] })"
+    else
+      puts "Movie not found: #{ movie }"
+    end
   end
 
   def list
@@ -113,11 +121,6 @@ class MoviePool
     else
       puts "Movie not found!"
     end
-  end
-  
-  def help
-    # TODO Help text
-    puts "Coming soon..."
   end
   
   def import(filename)
