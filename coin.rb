@@ -96,20 +96,20 @@ class MoviePool
   end
 
   def list
-    puts "TMDB ID - Title (Year)\n"
+    puts "TMDB ID  ".green << "Title".blue << " (Year)\n\n"
+    puts "Currently in the pool:"
     watched = []
     @movies.each do |key, movie|
       if movie.key? "watched"
         watched << movie
       else
-        puts "#{ movie.tmdb.to_s.green } - #{ movie.title.blue } (#{ movie.released[0..3] })"
+        puts "#{ movie.tmdb.to_s.green } \t #{ movie.title.blue } (#{ movie.released[0..3] })"
       end
     end
-    puts "\nWatched:"
+    puts "\nAlready watched:"
     watched.each do |movie|
-      puts "#{ movie.tmdb.to_s.green } - #{ movie.title.red } (#{ movie.released[0..3] })"
+      puts "#{ movie.tmdb.to_s.green } \t #{ movie.title.red } (#{ movie.released[0..3] })"
     end
-    pp @movies
   end
 
   def remove(tmdb)
