@@ -146,14 +146,14 @@ if __FILE__ == $0
 Coin is a utility for picking a semi-random selection from a pool of acceptable movies.
 
 Usage:
-    coin [action] <argument(s)>
+    #{ "coin".red } #{ "[action]".green } #{ "<argument(s)>".blue }
     
 Actions:
-    add, a         Add a new movie to the database. Arguments can be movie titles, IMDB addresses (www.imdb.com/title/<IDMB ID>) or TMDb addresses (www.themoviedb.org/movie/<TMDb ID>). If the title contains spaces, enclose it in double quotes (e.g. 'coin add "Kung Fu Panda"')
-    delete, d      Delete a movie from the database. Arguments are movie IDs (TMDb IDs) that are displayed by 'coin list'
-    flip, f        Get a semi-random movie from the database
-    list, l        List all movies in the database
-    import, i      Import movies from a file that contains one movie title/IMDB URL/TMDb URL per line. Arguments are paths to text files
+    #{ "add, a".green }         Add a new movie to the database. Arguments can be movie titles, IMDB addresses (www.imdb.com/title/<IDMB ID>) or TMDb addresses (www.themoviedb.org/movie/<TMDb ID>). If the title contains spaces, enclose it in double quotes (e.g. 'coin add "Kung Fu Panda"')
+    #{ "delete, d".green }      Delete a movie from the database. Arguments are movie IDs (TMDb IDs) that are displayed by 'coin list'
+    #{ "flip, f".green }        Get a semi-random movie from the database
+    #{ "list, l".green }        List all movies in the database
+    #{ "import, i".green }      Import movies from a file that contains one movie title/IMDB URL/TMDb URL per line. Arguments are paths to text files
     
 Options:
 EOS
