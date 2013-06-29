@@ -53,6 +53,9 @@ Coin will create a database file called `.coindb.json` in your home directory.
     	list, l        List all movies in the database
     	import, i      Import movies from a file that contains one movie
 					   title/IMDB URL/TMDb URL per line. Arguments are paths to text files
+		url, u         Add a URL to a movie in the database. When the movie is selected,
+					   the URL is opened with the command 'open <URL>'.
+					   Arguments are the ID of the movie and the URL/filename
 
 ## Bugs, problems, questions
 
