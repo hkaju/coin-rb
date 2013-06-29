@@ -109,7 +109,8 @@ class MoviePool
     puts "TMDB ID  ".green << "Title".blue << " (Year)\n\n"
     puts "Currently in the pool:"
     watched = []
-    @movies.each do |key, movie|
+    @movies.keys.sort.each do |key|
+      movie = @movies[key]
       if movie.key? "watched"
         watched << movie
       else
