@@ -28,7 +28,7 @@ class MoviePool
   
   def read_database
     db_path = DB_LOCATION + DBFILE
-    if File.exists? File.expand_path(db_path):
+    if File.exists? File.expand_path(db_path)
       json = File.read(File.expand_path(db_path))
       @movies = JSON.parse(json)
     else
