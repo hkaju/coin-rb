@@ -50,8 +50,11 @@ class MoviePool
         weight.to_i.times do pool << tmdb_id end
       end
     end
-
-    random_movie = @movies[pool.choice]
+    if pool.respond_to? :choice
+      random_movie = @movies[pool.choice]
+    else
+      random_movie = @movies[pool.sample]
+    end
     return random_movie
   end
   
