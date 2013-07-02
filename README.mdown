@@ -15,7 +15,7 @@
 If that exchange sounded familiar, you are in the right place!
 Coin is a command-line utility that chooses a semi-random movie from a previously compiled list.
 Movies can be added by title, IMDB address or themoviedb.org URL.
-Coin uses themoviedb.org as it's backend for downloading metadata.
+This product uses the TMDb API but is not endorsed or certified by TMDb.
 
 ### How does it work?
 Coin puts all unwatched movies from your list into a general pool and draws a semi-random choice from there.

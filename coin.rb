@@ -157,10 +157,10 @@ end
 
 if __FILE__ == $0
   pool = MoviePool.new
-  
+
   SUB_COMMANDS = %w(add a list l flip f remove delete d rm del import i url u)
   global_opts = Trollop::options do
-    version "coin-rb 0.1 (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>"
+    version "coin-rb 0.1 (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>\nThis product uses the TMDb API but is not endorsed or certified by TMDb."
     banner <<-EOS
 Coin is a utility for picking a semi-random selection from a pool of acceptable movies.
 
