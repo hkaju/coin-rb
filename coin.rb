@@ -8,6 +8,8 @@ require "trollop"
 require "pp"
 require "logger"
 
+VERSION = "0.9.0"
+
 Tmdb.api_key = "11433deecaf09ef3aa3fb68d7e02a772"
 
 DBFILE = ".coindb.json"
@@ -169,7 +171,7 @@ if __FILE__ == $0
 
   SUB_COMMANDS = %w(add a list l flip f remove delete d rm del import i url u)
   global_opts = Trollop::options do
-    version "coin-rb 0.1 (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>\nThis product uses the TMDb API but is not endorsed or certified by TMDb."
+    version "coin-rb #{ VERSION } (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>\nThis product uses the TMDb API but is not endorsed or certified by TMDb."
     banner <<-EOS
 Coin is a utility for picking a semi-random selection from a pool of acceptable movies.
 
