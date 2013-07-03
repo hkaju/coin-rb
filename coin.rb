@@ -6,6 +6,7 @@ require "ruby-tmdb3"
 require "colorize"
 require "trollop"
 require "pp"
+require "logger"
 
 Tmdb.api_key = "11433deecaf09ef3aa3fb68d7e02a772"
 
@@ -78,12 +79,18 @@ class MoviePool
   def add(movie, url=nil)
     imdb = movie.match /imdb.com\/title\/(tt\d+)/
     tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
-    if tmdb
-      result = TmdbMovie.find(:id => tmdb.captures[0], :limit => 1)
-    elsif imdb
-      result = TmdbMovie.find(:imdb => imdb.captures[0], :limit => 1)
-    else
-      result = TmdbMovie.find(:title => movie, :limit => 1)
+    logger = Logger.new(File.expand_path '~/coin.log', 'weekly')
+    result = []
+    begin
+      if tmdb
+        result = TmdbMovie.find(:id => tmdb.captures[0], :limit => 1)
+      elsif imdb
+        result = TmdbMovie.find(:imdb => imdb.captures[0], :limit => 1)
+      else
+        result = TmdbMovie.find(:title => movie, :limit => 1)
+      end
+    rescue RuntimeError => e
+      logger.error e.message
     end
     if result != []
       @movies[result.id.to_s] = {"title" => result.title,
@@ -96,6 +103,7 @@ class MoviePool
     else
       puts "Movie not found: #{ movie }"
     end
+    logger.close
   end
   
   def addurl(tmdb_id, url)
