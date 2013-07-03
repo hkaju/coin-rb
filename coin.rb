@@ -77,7 +77,7 @@ class MoviePool
   end
 
   def add(movie, url=nil)
-    imdb = movie.match /imdb.com\/title\/(tt\d+)/
+    imdb = movie.match /imdb.com\/title\/tt(\d+)/
     tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
     logger = Logger.new(File.expand_path '~/coin.log', 'weekly')
     result = []
@@ -85,7 +85,8 @@ class MoviePool
       if tmdb
         result = TmdbMovie.find(:id => tmdb.captures[0], :limit => 1)
       elsif imdb
-        result = TmdbMovie.find(:imdb => imdb.captures[0], :limit => 1)
+        imdb_id = imdb.captures[0].to_i
+        result = TmdbMovie.find(:imdb => "tt%07d" % imdb_id, :limit => 1)
       else
         result = TmdbMovie.find(:title => movie, :limit => 1)
       end
