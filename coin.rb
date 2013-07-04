@@ -81,7 +81,7 @@ class MoviePool
   def add(movie, url=nil)
     imdb = movie.match /imdb.com\/title\/tt(\d+)/
     tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
-    logger = Logger.new(File.expand_path '~/coin.log', 'weekly')
+    logger = Logger.new(File.expand_path '~/Library/Logs/coin.log', 'weekly')
     result = []
     begin
       if tmdb
