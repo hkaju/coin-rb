@@ -33,6 +33,10 @@ You can install them with
 
     gem install json themoviedb colorize trollop
 
+Or if you have Bundler installed
+    
+    bundle
+
 There is no special installation procedure for coin.
 If you want to make your life easier, copy `coin.rb` to a folder that is in your `$PATH` and rename it to `coin`.
 Coin will create a database file called `.coindb.json` in your home directory.
