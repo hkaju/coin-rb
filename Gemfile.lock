@@ -1,0 +1,22 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.3.5)
+    colorize (0.5.8)
+    deepopenstruct (0.1.2)
+    json (1.8.0)
+    ruby-tmdb3 (0.3.4)
+      addressable
+      deepopenstruct
+      deepopenstruct (>= 0.1.2)
+      json
+    trollop (2.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  colorize
+  json
+  ruby-tmdb3
+  trollop
