@@ -85,12 +85,12 @@ class MoviePool
     result = []
     begin
       if tmdb
-        result = TmdbMovie.find(:id => tmdb.captures[0], :limit => 1)
+        result = TmdbMovie.find(:id => tmdb.captures[0], :limit => 1, :expand_results => false)
       elsif imdb
         imdb_id = imdb.captures[0].to_i
-        result = TmdbMovie.find(:imdb => "tt%07d" % imdb_id, :limit => 1)
+        result = TmdbMovie.find(:imdb => "tt%07d" % imdb_id, :limit => 1, :expand_results => false)
       else
-        result = TmdbMovie.find(:title => movie, :limit => 1)
+        result = TmdbMovie.find(:title => movie, :limit => 1, :expand_results => false)
       end
     rescue RuntimeError => e
       logger.error e.message
