@@ -13,6 +13,7 @@ VERSION = "0.9.0"
 Tmdb.api_key = "11433deecaf09ef3aa3fb68d7e02a772"
 
 DBFILE = ".coindb.json"
+DBFILE_DEBUG = ".coindb.debug.json"
 DB_LOCATION = "~/"
 
 class ::Hash
@@ -25,12 +26,17 @@ end
 
 class MoviePool
   
-  def initialize
+  def initialize(debug_mode=false)
+    @debug_mode = debug_mode
     self.read_database
   end
   
   def read_database
-    db_path = DB_LOCATION + DBFILE
+    if @debug_mode
+      db_path = DB_LOCATION + DBFILE_DEBUG
+    else
+      db_path = DB_LOCATION + DBFILE
+    end
     if File.exists? File.expand_path(db_path)
       json = File.read(File.expand_path(db_path))
       @movies = JSON.parse(json)
@@ -40,7 +46,11 @@ class MoviePool
   end
 
   def write_database
-    db_path = DB_LOCATION + DBFILE
+    if @debug_mode
+      db_path = DB_LOCATION + DBFILE_DEBUG
+    else
+      db_path = DB_LOCATION + DBFILE
+    end
     File.open(File.expand_path(db_path), "w") { |f| f.write(@movies.to_json) }
   end
 
@@ -167,7 +177,6 @@ class MoviePool
 end
 
 if __FILE__ == $0
-  pool = MoviePool.new
 
   SUB_COMMANDS = %w(add a list l flip f remove delete d rm del import i url u)
   global_opts = Trollop::options do
@@ -188,9 +197,11 @@ Actions:
     
 Options:
 EOS
-    #opt :database, "Movie database file location", :default => File.expand_path(DB_LOCATION + DBFILE)
+    opt :debug, "Use debug database file (~/.coindb.debug.json)"
     stop_on SUB_COMMANDS
   end
+  
+  pool = MoviePool.new(debug_mode=global_opts[:debug])
 
   cmd = ARGV.shift
   cmd_opts = case cmd
