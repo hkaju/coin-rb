@@ -88,6 +88,11 @@ class MoviePool
     self.write_database
   end
 
+  def mark_as_unwatched(tmdb_id)
+    @movies[tmdb_id].delete("watched")
+    self.write_database
+  end
+
   def add(movie, url=nil)
     imdb = movie.match /imdb.com\/title\/tt(\d+)/
     tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
@@ -178,7 +183,7 @@ end
 
 if __FILE__ == $0
 
-  SUB_COMMANDS = %w(add a list l flip f remove delete d rm del import i url u)
+  SUB_COMMANDS = %w(add a list l flip f remove delete d rm del import i url u unwatch un)
   global_opts = Trollop::options do
     version "coin-rb #{ VERSION } (c) 2013 Hendrik Kaju <hendrik.kaju@gmail.com>\nThis product uses the TMDb API but is not endorsed or certified by TMDb."
     banner <<-EOS
@@ -194,6 +199,7 @@ Actions:
     #{ "list, l".green }        List all movies in the database
     #{ "import, i".green }      Import movies from a file that contains one movie title/IMDB URL/TMDb URL per line. Arguments are paths to text files
     #{ "url, u".green }         Add a URL to a movie in the database. When the movie is selected, the URL is opened with the command 'open <URL>'. Arguments are the ID of the movie and the URL/filename
+    #{ "unwatch, un".green }    Mark a movie as not watched. Argument is movie ID (TMDb ID) that are displayed by 'coin list'
     
 Options:
 EOS
@@ -222,6 +228,9 @@ EOS
       pool.flip
     when "import", "i"
       ARGV.each do |arg| pool.import arg  end
+    when "unwatch", "un"
+        tmdb_id = ARGV.shift
+        pool.mark_as_unwatched(tmdb_id)
     else
       Trollop::die "Unknown command #{cmd.inspect}"
     end

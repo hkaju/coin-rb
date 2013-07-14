@@ -60,6 +60,10 @@ Coin will create a database file called `.coindb.json` in your home directory.
 		url, u         Add a URL to a movie in the database. When the movie is selected,
 					   the URL is opened with the command 'open <URL>'.
 					   Arguments are the ID of the movie and the URL/filename
+        unwatch, un    Mark a movie as not watched. Argument is movie ID (TMDb ID) that 
+                       are displayed by the "list" command
+
+
 
 ## Bugs, problems, questions
 
