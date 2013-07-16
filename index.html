@@ -46,7 +46,7 @@ B <em>and</em> G <em>at the same time</em>: If only there was a simple, easy to 
 <p>If that exchange sounded familiar, you are in the right place!
 Coin is a command-line utility that chooses a semi-random movie from a previously compiled list.
 Movies can be added by title, IMDB address or themoviedb.org URL.
-Coin uses themoviedb.org as it's backend for downloading metadata.</p>
+This product uses the TMDb API but is not endorsed or certified by TMDb.</p>
 
 <h3>
 <a name="how-does-it-work" class="anchor" href="#how-does-it-work"><span class="octicon octicon-link"></span></a>How does it work?</h3>
@@ -68,6 +68,11 @@ A movie with a rating of 10.0 is about twice as likely to be chosen as one with 
 You can install them with</p>
 
 <pre><code>gem install json themoviedb colorize trollop
+</code></pre>
+
+<p>Or if you have Bundler installed</p>
+
+<pre><code>bundle
 </code></pre>
 
 <p>There is no special installation procedure for coin.
@@ -95,6 +100,8 @@ Actions:
     url, u         Add a URL to a movie in the database. When the movie is selected,
                    the URL is opened with the command 'open &lt;URL&gt;'.
                    Arguments are the ID of the movie and the URL/filename
+    unwatch, un    Mark a movie as not watched. Argument is movie ID (TMDb ID) that 
+                   are displayed by the "list" command
 </code></pre>
 
 <h2>
