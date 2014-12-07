@@ -8,7 +8,7 @@ require "trollop"
 require "pp"
 require "logger"
 
-VERSION = "0.9.0"
+VERSION = "0.9.1"
 
 Tmdb.api_key = "11433deecaf09ef3aa3fb68d7e02a772"
 
@@ -25,12 +25,12 @@ class ::Hash
 end
 
 class MoviePool
-  
+
   def initialize(debug_mode=false)
     @debug_mode = debug_mode
     self.read_database
   end
-  
+
   def read_database
     if @debug_mode
       db_path = DB_LOCATION + DBFILE_DEBUG
@@ -70,7 +70,7 @@ class MoviePool
     end
     return random_movie
   end
-  
+
   def flip
     movie = self.pick
       if movie
@@ -81,7 +81,7 @@ class MoviePool
         puts "No more unwatched movies in the database. Try adding some with 'coin add'."
       end
   end
-  
+
   def mark_as_watched(tmdb_id)
     time = Time.now
     @movies[tmdb_id]["watched"] = time.strftime("%Y-%m-%d %H:%M")
@@ -96,7 +96,9 @@ class MoviePool
   def add(movie, url=nil)
     imdb = movie.match /imdb.com\/title\/tt(\d+)/
     tmdb = movie.match /themoviedb.org\/movie\/(\d+)/
-    logger = Logger.new(File.expand_path '~/Library/Logs/coin.log', 'weekly')
+    if @debug_mode
+      logger = Logger.new(File.expand_path '~/Library/Logs/coin.log', 'weekly')
+    end
     result = []
     begin
       if tmdb
@@ -108,7 +110,9 @@ class MoviePool
         result = TmdbMovie.find(:title => movie, :limit => 1, :expand_results => false)
       end
     rescue RuntimeError => e
-      logger.error e.message
+      if @debug_mode
+        logger.error e.message
+      end
     end
     if result != []
       @movies[result.id.to_s] = {"title" => result.title,
@@ -121,9 +125,11 @@ class MoviePool
     else
       puts "Movie not found: #{ movie }"
     end
-    logger.close
+    if @debug_mode
+      logger.close
+    end
   end
-  
+
   def addurl(tmdb_id, url)
     if @movies.key? tmdb_id
       @movies[tmdb_id]["url"] = url
@@ -162,7 +168,7 @@ class MoviePool
       puts "Movie not found!"
     end
   end
-  
+
   def import(filename)
     if File.exist? filename
       puts "Importing #{ filename.dup.green }..."
@@ -191,7 +197,7 @@ Coin is a utility for picking a semi-random selection from a pool of acceptable 
 
 Usage:
     #{ "coin".red } #{ "[action]".green } #{ "<argument(s)>".blue }
-    
+
 Actions:
     #{ "add, a".green }         Add a new movie to the database. Arguments can be movie titles, IMDB addresses (www.imdb.com/title/<IDMB ID>) or TMDb addresses (www.themoviedb.org/movie/<TMDb ID>). If the title contains spaces, enclose it in double quotes (e.g. 'coin add "Kung Fu Panda"')
     #{ "delete, d".green }      Delete a movie from the database. Arguments are movie IDs (TMDb IDs) that are displayed by 'coin list'
@@ -200,13 +206,13 @@ Actions:
     #{ "import, i".green }      Import movies from a file that contains one movie title/IMDB URL/TMDb URL per line. Arguments are paths to text files
     #{ "url, u".green }         Add a URL to a movie in the database. When the movie is selected, the URL is opened with the command 'open <URL>'. Arguments are the ID of the movie and the URL/filename
     #{ "unwatch, un".green }    Mark a movie as not watched. Argument is movie ID (TMDb ID) that are displayed by 'coin list'
-    
+
 Options:
 EOS
     opt :debug, "Use debug database file (~/.coindb.debug.json)"
     stop_on SUB_COMMANDS
   end
-  
+
   pool = MoviePool.new(debug_mode=global_opts[:debug])
 
   cmd = ARGV.shift
